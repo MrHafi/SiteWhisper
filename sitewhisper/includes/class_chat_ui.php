@@ -16,6 +16,12 @@ class SW_Chat_UI {
     }
 
     private function init() {
+
+     // Start session early
+    if ( ! session_id() ) {
+        session_start();
+    }
+
         // Add chat bubble to frontend only
         add_action( 'wp_footer', [ $this, 'render_chat' ] );
         // Register AJAX handlers for both logged in and guest users
@@ -23,6 +29,10 @@ class SW_Chat_UI {
         add_action( 'wp_ajax_nopriv_sw_send_message', [ $this, 'handle_message' ] );
         // Enqueue styles and scripts
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_assets' ] );
+
+        // Register history loader
+        add_action( 'wp_ajax_sw_get_history',        [ $this, 'get_history' ] );
+        add_action( 'wp_ajax_nopriv_sw_get_history', [ $this, 'get_history' ] );
     }
 
     // Enqueue CSS and JS files
@@ -78,24 +88,76 @@ class SW_Chat_UI {
         <?php
     }
 
-    // Handle AJAX message request
-    public function handle_message() {
+    // Handle AJAX message requestpublic 
+    function handle_message() {
 
-        // Security check
-        check_ajax_referer( 'sw_nonce', 'nonce' );
+    check_ajax_referer( 'sw_nonce', 'nonce' );
 
-        // Get and sanitize user message
-        $message = sanitize_text_field( $_POST['message'] ?? '' );
+    $session_id = session_id(); // already started in init()
 
-        if ( empty( $message ) ) {
-            wp_send_json_error( 'Empty message.' );
-        }
+    error_log( 'Session ID: ' . $session_id ); // debug
 
-        // Send to AI and get response
-      $ai       = new SW_AI();
-$response = $ai->send_message( $message );
+    $message = sanitize_text_field( $_POST['message'] ?? '' );
 
-        wp_send_json_success( $response );
+    if ( empty( $message ) ) {
+        wp_send_json_error( 'Empty message.' );
     }
 
+    $ai       = new SW_AI();
+    $response = $ai->send_message( $message );
+
+    $this->save_to_log( $session_id, $message, $response );
+
+    wp_send_json_success( $response );
+}
+
+
+
+
+// ============================== HISTORY AND SESSION ========================================================
+
+
+// Save message and response to DB
+private function save_to_log( $session_id, $message, $response ) {
+    global $wpdb;
+
+    $wpdb->insert(
+        $wpdb->prefix . 'sw_chat_logs', // table name
+        [
+            'session_id' => $session_id, // unique session
+            'message'    => $message,    // user message
+            'response'   => $response,   // AI response
+        ]
+    );
+}
+
+// Get chat history for current session
+private function get_session_history( $session_id ) {
+    global $wpdb;
+
+    // Fetch all logs for this session
+    return $wpdb->get_results(
+        $wpdb->prepare(
+            "SELECT message, response FROM {$wpdb->prefix}sw_chat_logs WHERE session_id = %s ORDER BY id ASC",
+            $session_id
+        )
+    );
+}
+
+
+
+// Return session history as JSON
+public function get_history() {
+
+    check_ajax_referer( 'sw_nonce', 'nonce' );
+
+    if ( ! session_id() ) {
+        session_start();
+    }
+
+    $session_id = session_id();
+    $history    = $this->get_session_history( $session_id );
+
+    wp_send_json_success( $history );
+}
 }

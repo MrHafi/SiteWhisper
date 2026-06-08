@@ -35,7 +35,8 @@ class SW_Site_Reader {
         return $content;
     }
 
-    // Build system prompt with site content public function get_system_prompt() {
+    // Build system prompt with site content
+     public function get_system_prompt() {
     $site_name    = get_bloginfo( 'name' );
     $site_content = $this->get_site_content();
 

@@ -99,4 +99,27 @@ document.addEventListener( 'DOMContentLoaded', function () {
         });
     }
 
+
+
+
+// Load chat history on page load
+fetch( SW.ajax_url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+        action: 'sw_get_history',
+        nonce:  SW.nonce,
+    })
+})
+.then( res => res.json() )
+.then( data => {
+    if ( data.success && data.data.length > 0 ) {
+        // Show each saved message in chat
+        data.data.forEach( row => {
+            add_message( row.message,  'user' ); // user message
+            add_message( row.response, 'bot'  ); // AI response
+        });
+    }
+});
+
 });
