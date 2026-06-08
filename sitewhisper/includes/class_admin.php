@@ -57,8 +57,9 @@ class SW_Admin {
                 <table class="form-table">
 
                     <!-- API Key -->
+                   <!-- API Key -->
                     <tr>
-                        <th><label for="sw_api_key">Gemini API Key</label></th>
+                        <th><label for="sw_api_key">OpenRouter API Key</label></th>
                         <td>
                             <input
                                 type="password"
@@ -67,6 +68,10 @@ class SW_Admin {
                                 value="<?php echo esc_attr( $api_key ); ?>"
                                 class="regular-text"
                             />
+                            <p class="description">
+                                Get your free API key from 
+                                <a href="https://openrouter.ai/settings/keys" target="_blank">OpenRouter</a>
+                            </p>
                         </td>
                     </tr>
 

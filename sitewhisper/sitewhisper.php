@@ -39,6 +39,7 @@ class SiteWhisper {
         require_once SW_PATH . 'includes/class_admin.php';
         require_once SW_PATH . 'includes/class_ai.php';
         require_once SW_PATH . 'includes/class_chat_ui.php';
+        require_once SW_PATH . 'includes/class_site_reader.php';
 
     }
 

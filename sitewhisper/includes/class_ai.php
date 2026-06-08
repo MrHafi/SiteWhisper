@@ -21,11 +21,19 @@ class SW_AI {
             return 'API key is missing. Please add it in SiteWhisper settings.';
         }
 
-        // Build request body — OpenRouter format
+        // Get site content as system prompt
+        $site_reader   = new SW_Site_Reader();
+        $system_prompt = $site_reader->get_system_prompt();
+
+        // Debug — remove after testing
+        error_log( 'System prompt: ' . $system_prompt );
+
+        // Build request body with system prompt
         $body = json_encode([
-'model' => 'openrouter/free',
+'model' => 'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning-20260428:free',
             'messages' => [
-                [ 'role' => 'user', 'content' => $user_message ]
+                [ 'role' => 'system', 'content' => $system_prompt ], // brief AI with site content
+                [ 'role' => 'user',   'content' => $user_message  ], // visitor question
             ]
         ]);
 
@@ -48,9 +56,7 @@ class SW_AI {
         // Parse response
         $data = json_decode( wp_remote_retrieve_body( $response ), true );
 
-       return $data['choices'][0]['message']['content'] ?? 'No response received.';
-
-        
+        return $data['choices'][0]['message']['content'] ?? 'No response received.';
     }
 
 }
