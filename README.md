@@ -9,5 +9,5 @@ Features:
 - Floating chat bubble on frontend
 - Open Router  AI powered responses
 - Admin settings panel
-- Lightweight — single file architecture
+- Lightweight — Limited files architecture 
 - No third party dependencies
