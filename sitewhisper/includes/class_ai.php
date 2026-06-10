@@ -25,8 +25,6 @@ class SW_AI {
         $site_reader   = new SW_Site_Reader();
         $system_prompt = $site_reader->get_system_prompt();
 
-        // Debug — remove after testing
-        error_log( 'System prompt: ' . $system_prompt );
 
         // Build request body with system prompt
         $body = json_encode([

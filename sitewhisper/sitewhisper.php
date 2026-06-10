@@ -2,7 +2,7 @@
 /**
  * Plugin Name: SiteWhisper
  * Plugin URI:  #
- * Description: AI Chatbot powered by Gemini API
+ * Description: AI Chatbot powered by Open Router
  * Version:     1.0.0
  * Author:      Kamran
  * Text Domain: sitewhisper
